@@ -13,15 +13,30 @@ const maxRows = 10;
 const state = {
   currentPlayer: 1,
   player1: {
-    currentLocation: 1,
+    name: "Player 1",
+    currentLocation: 1
   },
   player2: {
-    currentLocation: 1,
+    name: "Player 2",
+    currentLocation: 1
   },
   diceResult: 1,
+  isPlayerMoving: true,
+  players: [
+    {
+      id: 1,
+      name: "Player 1",
+      currentLocation: 1
+    },
+    {
+      id: 2,
+      name: "Player 2",
+      currentLocation: 1
+    }
+  ]
 };
 const snakePoint = {
-  limit: 5,
+  limit: 20,
   points: [],
 };
 const ladderPoint = {
@@ -49,8 +64,6 @@ const generateBoard = () => {
     }
   }
 
-
-
   // DEBUG ONLY!
   // let newLine = document.createElementNS(svgns, "line");
   // let square80 = document.querySelector(".square-2"); //.getBoundingClientRect();
@@ -68,12 +81,15 @@ const generateBoard = () => {
 const generateSnakes = () => {
   for (let i = 1; i <= snakePoint.limit; i++) {
     const startPoint = assignSnakeAndLadderPoint(1, maxRows * maxColumns - 1);
-    const endPoint = assignSnakeAndLadderPoint(startPoint, maxRows * maxColumns);
+    const endPoint = assignSnakeAndLadderPoint(
+      startPoint,
+      maxRows * maxColumns
+    );
     try {
       const startSquare = document.querySelector(`.square-${startPoint}`);
       const endSquare = document.querySelector(`.square-${endPoint}`);
 
-      snakePoint.points.push({startSquare, endSquare});
+      snakePoint.points.push({ startPoint, endPoint });
 
       const drawLine = document.createElementNS(svgns, "line");
       drawLine.setAttribute(
@@ -108,41 +124,63 @@ const rollDice = (min = 1, max = 6) => {
 };
 
 const assignSnakeAndLadderPoint = (min = 1, max = 99) => {
-  let point =  Math.floor(Math.random() * (max - min + 1)) + min;
-  if(point === min && point < maxRows * maxColumns) {
+  let point = Math.floor(Math.random() * (max - min + 1)) + min;
+  if (point === min && point < maxRows * maxColumns) {
     point += 1;
   }
   return point;
 };
 
-btnDice.addEventListener("click", (e) => {
-  state.diceResult = rollDice();
-  if (state.currentPlayer === 1) {
-    if (!(state.player1.currentLocation + state.diceResult > 100)) {
-      state.player1.currentLocation =
-        state.player1.currentLocation + state.diceResult;
-      console.log(player1);
+const checkCurrentPosition = (player) => {
+  const isSnake = snakePoint.points.find(
+    (snake) => snake.endPoint === player.currentLocation
+  );
+  if (isSnake) {
+    console.info(`${player.name} is in ${isSnake}`);
+    player.currentLocation = isSnake.startPoint;
+    setTimeout(() => {
       document
-        .querySelector(`.square-${state.player1.currentLocation}`)
+        .querySelector(`.square-${player.currentLocation}`)
         .appendChild(player1);
-      player1.style.position = "absolute";
-    }
-    state.currentPlayer = 2;
-  } else if (state.currentPlayer === 2) {
-    if (!(state.player2.currentLocation + state.diceResult > 100)) {
-      state.player2.currentLocation =
-        state.player2.currentLocation + state.diceResult;
-      document
-        .querySelector(`.square-${state.player2.currentLocation}`)
-        .appendChild(player2);
-      player2.style.position = "absolute";
-    }
-
-    state.currentPlayer = 1;
+    }, 500);
   }
-  diceResult.textContent = `Result: ${rollDice()}`;
-  currentPlayer.textContent = state.currentPlayer;
+};
+const movePlayer = () => {
+  btnDice.disabled = true;
+  setTimeout(() => {
+    state.diceResult = rollDice();
+    player1.style.position = "absolute";
+    player2.style.position = "absolute";
+    if (state.currentPlayer === 1) {
+      if (!(state.player1.currentLocation + state.diceResult > 100)) {
+        state.player1.currentLocation =
+          state.player1.currentLocation + state.diceResult;
+        document
+          .querySelector(`.square-${state.player1.currentLocation}`)
+          .appendChild(player1);
+        checkCurrentPosition(state.player1);
+      }
+      state.currentPlayer = 2;
+    } else if (state.currentPlayer === 2) {
+      if (!(state.player2.currentLocation + state.diceResult > 100)) {
+        state.player2.currentLocation =
+          state.player2.currentLocation + state.diceResult;
+        document
+          .querySelector(`.square-${state.player2.currentLocation}`)
+          .appendChild(player2);
+        checkCurrentPosition(state.player2);
+      }
 
+      state.currentPlayer = 1;
+    }
+    diceResult.textContent = `Result: ${rollDice()}`;
+    currentPlayer.textContent = state.currentPlayer;
+    state.isPlayerMoving = false;
+    btnDice.disabled = false;
+  }, 500);
+};
+
+const checkForWinner = ()=>{
   if (state.player1.currentLocation === 100) {
     diceResult.textContent = `Result: Player 1 Wins!!!`;
     btnDice.disabled = true;
@@ -151,6 +189,11 @@ btnDice.addEventListener("click", (e) => {
     btnDice.disabled = true;
   }
 
+};
+
+btnDice.addEventListener("click", (e) => {
+  movePlayer();
+  checkForWinner();
   console.log(state);
 });
 window.onload = () => {
