@@ -15,10 +15,12 @@ const state = {
   player1: {
     name: "Player 1",
     currentLocation: 0,
+    ref: player1,
   },
   player2: {
     name: "Player 2",
     currentLocation: 0,
+    ref: player2,
   },
   diceResult: 0,
   isPlayerMoving: true,
@@ -63,6 +65,8 @@ const generateBoard = () => {
       board.appendChild(square);
     }
   }
+  board.appendChild(player1);
+  board.appendChild(player2);
 };
 
 const generateSnakes = () => {
@@ -169,34 +173,43 @@ const checkCurrentPosition = (player) => {
     console.info(`${player.name} is in ${isSnake}`);
     player.currentLocation = isSnake.startPoint;
     setTimeout(() => {
-      document
-        .querySelector(`.square-${player.currentLocation}`)
-        .appendChild(player1);
+      const targetSquare = document.querySelector(
+        `.square-${player.currentLocation}`
+      );
+      animatePlayerToTarget(player.ref, targetSquare);
     }, 250);
   }
   if (isLadder) {
     console.info(`${player.name} is in ${isLadder.toString()}`);
     player.currentLocation = isLadder.endPoint;
     setTimeout(() => {
-      document
-        .querySelector(`.square-${player.currentLocation}`)
-        .appendChild(player1);
+      const targetSquare = document.querySelector(
+        `.square-${player.currentLocation}`
+      );
+      animatePlayerToTarget(player.ref, targetSquare);
     }, 250);
   }
+};
+const animatePlayerToTarget = (player, target) => {
+  player.style.left = `${
+    target.offsetLeft + target.offsetWidth / 2 - player.offsetWidth / 2
+  }px`;
+  player.style.top = `${
+    target.offsetTop + target.offsetHeight / 2 - player.offsetHeight / 2
+  }px`;
 };
 const movePlayer = () => {
   btnDice.disabled = true;
   state.diceResult = rollDice();
 
-  player1.style.position = "absolute";
-  player2.style.position = "absolute";
   if (state.currentPlayer === 1) {
     if (!(state.player1.currentLocation + state.diceResult > 100)) {
       state.player1.currentLocation =
         state.player1.currentLocation + state.diceResult;
-      document
-        .querySelector(`.square-${state.player1.currentLocation}`)
-        .appendChild(player1);
+      const targetSquare = document.querySelector(
+        `.square-${state.player1.currentLocation}`
+      );
+      animatePlayerToTarget(player1, targetSquare);
       checkCurrentPosition(state.player1);
     }
     state.currentPlayer = 2;
@@ -204,9 +217,10 @@ const movePlayer = () => {
     if (!(state.player2.currentLocation + state.diceResult > 100)) {
       state.player2.currentLocation =
         state.player2.currentLocation + state.diceResult;
-      document
-        .querySelector(`.square-${state.player2.currentLocation}`)
-        .appendChild(player2);
+      const targetSquare = document.querySelector(
+        `.square-${state.player2.currentLocation}`
+      );
+      animatePlayerToTarget(player2, targetSquare);
       checkCurrentPosition(state.player2);
     }
 
