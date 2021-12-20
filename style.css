@@ -4,8 +4,7 @@
 #root {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
+  min-height: 100vh;
 }
 #board {
   display: grid;
@@ -31,7 +30,7 @@
   width: 640px;
   height: 640px;
   position: relative;
-  
+  margin: auto;
 }
 .square {
   width: 100%;
@@ -76,6 +75,7 @@
 
 #dice {
   padding: 1rem;
+  margin: auto;
 }
 svg {
   position: absolute;
