@@ -10,6 +10,7 @@ const svgns = "http://www.w3.org/2000/svg";
 
 const maxColumns = 10;
 const maxRows = 10;
+let totalTurns = 0;
 
 const state = {
   currentPlayer: 0,
@@ -20,12 +21,18 @@ const state = {
       name: "Player 1",
       currentLocation: 0,
       ref: player1,
+      ladderCollisionCount: 0,
+      snakeCollisonCount: 0,
+      totalSquaresMoved: 0
     },
     {
       id: 1,
       name: "Player 2",
       currentLocation: 0,
       ref: player2,
+      ladderCollisionCount: 0,
+      snakeCollisonCount: 0,
+      totalSquaresMoved: 0
     },
   ],
 };
@@ -39,7 +46,7 @@ const ladderPoint = {
 };
 
 let availableBoardPoints = [];
-for (let i = 1; i <= maxRows * maxColumns - 1; i++) {
+for (let i = 1; i <= maxRows * maxColumns; i++) {
   availableBoardPoints.push(i);
 }
 
@@ -47,6 +54,18 @@ const minPlayers = 2;
 const maxPlayers = 5;
 let availablePlayerColors = ["red", "green", "blue", "cyan", "black"];
 let playerCount = 2;
+
+let isAiMode = false;
+let isAutoMode = false;
+
+const diceLog = {
+  "1": 0,
+  "2": 0,
+  "3": 0,
+  "4": 0,
+  "5": 0,
+  "6": 0
+}
 
 const generatePlayers = () => {
   if (playerCount <= maxPlayers && playerCount >= minPlayers) {
@@ -72,6 +91,9 @@ const generatePlayers = () => {
         name: `Player ${i + 1}`,
         currentLocation: 0,
         domRef: player,
+        ladderCollisionCount: 0,
+        snakeCollisonCount: 0,
+        totalSquaresMoved: 0,
       };
       state.players.push(playerInfo);
       board.appendChild(player);
@@ -106,11 +128,13 @@ const generateBoard = () => {
 
 const generateSnakes = () => {
   for (let i = 1; i <= snakePoint.limit; i++) {
-    const startPoint = assignSnakeAndLadderPoint(1, maxRows * maxColumns - 1);
-    const endPoint = assignSnakeAndLadderPoint(
-      startPoint,
-      maxRows * maxColumns
-    );
+    let startPoint = assignSnakeAndLadderPoint(1, maxRows * maxColumns - 1);
+    let endPoint = assignSnakeAndLadderPoint(1, maxRows * maxColumns);
+    if (endPoint < startPoint) {
+      let temp = startPoint;
+      startPoint = endPoint;
+      endPoint = temp;
+    }
     try {
       const startSquare = document.querySelector(`.square-${startPoint}`);
       const endSquare = document.querySelector(`.square-${endPoint}`);
@@ -146,10 +170,12 @@ const generateSnakes = () => {
 const generateLadders = () => {
   for (let i = 1; i <= ladderPoint.limit; i++) {
     let startPoint = assignSnakeAndLadderPoint(1, maxRows * maxColumns - 1);
-    const endPoint = assignSnakeAndLadderPoint(
-      startPoint,
-      maxRows * maxColumns
-    );
+    let endPoint = assignSnakeAndLadderPoint(1, maxRows * maxColumns);
+    if (endPoint < startPoint) {
+      let temp = startPoint;
+      startPoint = endPoint;
+      endPoint = temp;
+    }
 
     try {
       const startSquare = document.querySelector(`.square-${startPoint}`);
@@ -188,14 +214,13 @@ const rollDice = (min = 1, max = 6, type) => {
 };
 
 const assignSnakeAndLadderPoint = (min = 1, max = 99) => {
-  let point =
-    availableBoardPoints[
-      Math.floor(Math.random() * (availableBoardPoints.length - min + 1)) + min
-    ];
-  availableBoardPoints = availableBoardPoints.filter(
-    (availableBoardPoint) => availableBoardPoint !== point
-  );
-  console.log(point);
+  const minIndex = availableBoardPoints.indexOf(min);
+  const randIndex =
+    Math.floor(Math.random() * (availableBoardPoints.length - minIndex)) +
+    minIndex;
+  let point = availableBoardPoints[randIndex];
+  availableBoardPoints.splice(randIndex, 1);
+  console.log(min, minIndex, randIndex, point);
   return point;
 };
 
@@ -209,6 +234,7 @@ const checkCurrentPosition = (player) => {
   if (isSnake) {
     console.info(`${player.name} is in ${isSnake}`);
     player.currentLocation = isSnake.startPoint;
+    player.snakeCollisonCount++;
     setTimeout(() => {
       const targetSquare = document.querySelector(
         `.square-${player.currentLocation}`
@@ -219,6 +245,7 @@ const checkCurrentPosition = (player) => {
   if (isLadder) {
     console.info(`${player.name} is in ${isLadder.toString()}`);
     player.currentLocation = isLadder.endPoint;
+    player.ladderCollisionCount++;
     setTimeout(() => {
       const targetSquare = document.querySelector(
         `.square-${player.currentLocation}`
@@ -228,23 +255,32 @@ const checkCurrentPosition = (player) => {
   }
 };
 const animatePlayerToTarget = (player, target) => {
-  player.style.left = `${
-    target.offsetLeft + target.offsetWidth / 2 - player.offsetWidth / 2
-  }px`;
-  player.style.top = `${
-    target.offsetTop + target.offsetHeight / 2 - player.offsetHeight / 2
-  }px`;
+  try {
+    player.style.left = `${
+      target.offsetLeft + target.offsetWidth / 2 - player.offsetWidth / 2
+    }px`;
+    player.style.top = `${
+      target.offsetTop + target.offsetHeight / 2 - player.offsetHeight / 2
+    }px`;
+  } catch (ex) {
+    console.error(ex);
+  }
 };
 const movePlayer = () => {
   state.diceResult = rollDice();
-  diceResult.textContent = `${state.players[state.currentPlayer].name}'s result: ${state.diceResult}`;
+  diceResult.textContent = `${
+    state.players[state.currentPlayer].name
+  }'s result: ${state.diceResult}`;
+  diceLog[state.diceResult]++;
   for (let i = 0; i < state.players.length; i++) {
     if (state.currentPlayer === i) {
+      totalTurns++;
       if (!(state.players[i].currentLocation + state.diceResult > 100)) {
         btnDice.disabled = true;
         currentPlayerText.textContent = state.players[i].name;
         state.players[i].currentLocation =
           state.players[i].currentLocation + state.diceResult;
+        state.players[i].totalSquaresMoved++;
         const targetSquare = document.querySelector(
           `.square-${state.players[i].currentLocation}`
         );
@@ -254,6 +290,16 @@ const movePlayer = () => {
           btnDice.disabled = false;
           checkForWinner(state.players[i]);
         }, 300);
+      }
+      if (isAiMode && state.currentPlayer !== 0) {
+        setTimeout(() => {
+          aiMove();
+        }, 500);
+      }
+      if (isAutoMode) {
+        setTimeout(() => {
+          aiMove();
+        }, 500);
       }
       if (state.currentPlayer < state.players.length - 1) {
         state.currentPlayer = i + 1;
@@ -266,16 +312,20 @@ const movePlayer = () => {
   }
 };
 
+const aiMove = () => {
+  btnDice.click();
+};
+
 const checkForWinner = (player) => {
   if (player.currentLocation === 100) {
-    diceResult.textContent = `Result: Player ${player.name} Wins!!!`;
+    diceResult.innerHTML = `Result: Player ${player.name} Wins!!!<br/>Total turns: ${totalTurns}`;
     btnDice.disabled = true;
   }
 };
 
 btnDice.addEventListener("click", (e) => {
   movePlayer();
-  console.log(state);
+  console.log(totalTurns);
 });
 window.onload = () => {
   generateBoard();
