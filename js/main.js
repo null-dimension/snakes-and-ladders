@@ -60,10 +60,12 @@ for (let i = 1; i <= maxRows * maxColumns - 1; i++) {
 const minPlayers = 2;
 const maxPlayers = 5;
 let availablePlayerColors = ["red", "green", "blue", "cyan", "black"];
-let playerCount = 5;
+let playerCount = 2;
 
-let isAiMode = false;
-let isAutoMode = true;
+let isAiMode = true;
+let isAutoMode = false;
+
+
 
 const diceLog = {
   1: 0,
@@ -145,6 +147,15 @@ const movePlayer = () => {
           checkForWinner(state.players[i]);
         }, 300);
       }
+      
+      if (state.currentPlayer < state.players.length - 1) {
+        state.currentPlayer = i + 1;
+      } else {
+        state.currentPlayer = 0;
+      }
+      setTimeout(()=>{
+        currentPlayerText.textContent = state.players[state.currentPlayer].name;
+      }, 500);
       if (isAiMode && state.currentPlayer !== 0) {
         setTimeout(() => {
           aiMove();
@@ -155,12 +166,6 @@ const movePlayer = () => {
           aiMove();
         }, 500);
       }
-      if (state.currentPlayer < state.players.length - 1) {
-        state.currentPlayer = i + 1;
-      } else {
-        state.currentPlayer = 0;
-      }
-      currentPlayerText.textContent = state.players[state.currentPlayer].name;
       break;
     }
   }
@@ -183,8 +188,25 @@ btnDice.addEventListener("click", (e) => {
 });
 
 window.onload = () => {
+  
+  if(localStorage.getItem('player_count')) {
+    if(localStorage.getItem('player_count') <= maxPlayers) {
+      playerCount = localStorage.getItem('player_count');
+    }
+  }
+  if(localStorage.getItem('play_type')) {
+    if(localStorage.getItem('play_type') === 'play_auto') {
+      isAutoMode = true;
+      isAiMode = false;
+    } else if(localStorage.getItem('play_type') === 'play_ai') {
+      isAiMode = true;
+      isAutoMode = false;
+    } else if(localStorage.getItem('play_type') === 'play_human') {
+      isAutoMode = false;
+      isAiMode = false;
+    }
+  }
   generateBoard(board, maxRows, maxColumns);
-
   generatePlayers(
     state,
     board,
