@@ -4,36 +4,64 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dice Racer - Settings</title>
+    <title>Snakes and Ladders - Settings</title>
+    <link rel="stylesheet" href="css/style.css" />
   </head>
 
   <body>
     <section id="settings">
-      <div>
+      <div class="settings-nav">
         <ul>
           <li><a href="menu.html">Menu</a></li>
           <li><a href="index.html">Play</a></li>
         </ul>
       </div>
-      <div>
+      <div class="settings-list">
         <form>
-          <div>
-            <label for="">Number of players</label>
-            <input type="range" min="2" max="5" value="2" id="player_count_input" />
+          <div class="settings-list-item">
+            <label>Number of players</label>
+            <input
+              type="range"
+              min="2"
+              max="5"
+              value="2"
+              id="player_count_input"
+            />
             <span id="player_count_text">2</span>
           </div>
-          <div>
-            <div>
-              <label for="">Auto Play</label>
-              <input type="radio" name="play_type" class="play_type" value="play_auto" />
+          <div class="settings-list-item">
+            <div class="settings-list-subitem">
+              <label
+                >Auto Play
+                <input
+                  type="radio"
+                  name="play_type"
+                  class="play_type"
+                  value="play_auto"
+                />
+              </label>
             </div>
-            <div>
-              <label for="">Play With AI</label>
-              <input type="radio" name="play_type" class="play_type" value="play_ai" />
+            <div class="settings-list-subitem">
+              <label
+                >Play With AI
+                <input
+                  type="radio"
+                  name="play_type"
+                  class="play_type"
+                  value="play_ai"
+                />
+              </label>
             </div>
-            <div>
-              <label for="">Play With human</label>
-              <input type="radio" name="play_type" class="play_type" value="play_human" />
+            <div class="settings-list-subitem">
+              <label
+                >Local Multiplayer
+                <input
+                  type="radio"
+                  name="play_type"
+                  class="play_type"
+                  value="play_human"
+                />
+              </label>
             </div>
           </div>
         </form>
@@ -43,24 +71,24 @@
       let maxPlayersInput = document.querySelector("#player_count_input");
       let maxPlayersText = document.querySelector("#player_count_text");
       let playType = document.querySelectorAll(".play_type");
-      if(localStorage.getItem("player_count")) {
-          maxPlayersInput.value = localStorage.getItem("player_count");
-          maxPlayersText.innerHTML =localStorage.getItem("player_count");
+      if (localStorage.getItem("player_count")) {
+        maxPlayersInput.value = localStorage.getItem("player_count");
+        maxPlayersText.innerHTML = localStorage.getItem("player_count");
       }
-      if(localStorage.getItem("play_type")) {
-        playType.forEach(type => {
-            if(type.value === localStorage.getItem("play_type")) {
-                type.checked = true;
-            }
+      if (localStorage.getItem("play_type")) {
+        playType.forEach((type) => {
+          if (type.value === localStorage.getItem("play_type")) {
+            type.checked = true;
+          }
         });
       }
       maxPlayersInput.addEventListener("input", (e) => {
         maxPlayersText.innerHTML = e.target.value;
         localStorage.setItem("player_count", e.target.value);
       });
-      playType.forEach(type => {
-        type.addEventListener("change", (e)=>{
-            localStorage.setItem("play_type", e.target.value);
+      playType.forEach((type) => {
+        type.addEventListener("change", (e) => {
+          localStorage.setItem("play_type", e.target.value);
         });
       });
     </script>
