@@ -1,5 +1,12 @@
 * {
   transition: 0.2s ease-in;
+  margin: 0;
+  padding: 0;
+}
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
 }
 #root {
   display: flex;
@@ -90,4 +97,60 @@ svg {
   width: 100%;
   height: 100%;
   opacity: 0.5;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(rgb(255, 255, 255), rgb(167, 167, 167));
+}
+
+a {
+  text-decoration: none;
+}
+
+
+#menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+#menu div {
+  text-align: center;
+}
+
+#menu a {
+  font-size: 2rem;
+  padding: 1rem;
+  background-color: aqua;
+  border-radius: 20px;
+}
+#menu ul {
+  list-style: none;
+}
+#menu ul li {
+  padding: 1rem;
+  margin: 0.5rem 0;
+}
+
+#settings {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  font-size: 1.5rem;
+}
+.settings-nav ul{
+  list-style: none;
+  display: flex;
+}
+.settings-nav ul li {
+  padding: 1rem;
+}
+.settings-list-item {
+  padding: 1rem;
+}
+.settings-list-subitem{
+  padding: 1rem 0;
 }
