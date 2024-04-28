@@ -13,6 +13,7 @@
   justify-content: center;
   flex-direction: column-reverse;
   min-height: 100vh;
+  position: relative;
 }
 #board {
   display: grid;
@@ -101,7 +102,6 @@ svg {
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(rgb(255, 255, 255), rgb(167, 167, 167));
 }
 
 a {
@@ -115,15 +115,32 @@ a {
   align-items: center;
   height: 100vh;
 }
+
+#menu h1 {
+  font-size: 2rem;
+
+}
 #menu div {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 #menu a {
-  font-size: 2rem;
+  font-size: 1.2rem;
   padding: 1rem;
-  background-color: aqua;
+  background-color: #333;
   border-radius: 20px;
+  color: #eee;
+  display: block;
+  width: 200px;
+  transition: all 0.1s ease-in;
+}
+#menu a:hover {
+  transform: scale(1.1);
+  font-weight: bold;
 }
 #menu ul {
   list-style: none;
@@ -148,9 +165,65 @@ a {
 .settings-nav ul li {
   padding: 1rem;
 }
+.settings-nav ul li a{
+  font-size: 1.2rem;
+  padding: 1rem;
+  background-color: #333;
+  border-radius: 20px;
+  color: #eee;
+  display: block;
+  width: 200px;
+  transition: all 0.1s ease-in;
+  text-align: center;
+}
+.settings-nav ul li a:hover {
+  transform: scale(1.1);
+  font-weight: bold;
+}
 .settings-list-item {
   padding: 1rem;
 }
 .settings-list-subitem{
   padding: 1rem 0;
+}
+.btn-settings {
+  background: #333;
+  color: #eee;
+  border-radius: 5px;
+  padding: 0.3rem;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  transition: all 0.1s ease;
+  z-index: 10;
+}
+.btn-settings:hover {
+  transform: scale(1.1);
+}
+
+#dice {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#btn-dice {
+  background: #00aa3c;
+  color: #eee;
+  border-radius: 5px;
+  padding: 0.3rem;
+  border: 0;
+  box-shadow: 0 0 5px 0px #333;
+  text-shadow: 0 0 3px #333;
+  transition: all 0.1s ease;
+  margin: 0.5rem;
+  font-size: 1.2rem;
+}
+#btn-dice:hover {
+  transform: scale(1.1);
+}
+#btn-dice:disabled {
+  background-color: #6b6b6b;
+  transform: scale(1);
 }
